@@ -1,0 +1,148 @@
+### 方案
+
+​	我们使用`eslint` + `husky` + `lint-staged`的方案 ↓
+
+- eslint：规范配置。推荐腾讯的eslint-config-alloy。
+- husky：可以用于实各种 `Git Hook`。这里主要用到 `pre-commit` 这个 hook，在执行 commit 之前，运行一些自定义操作。
+- lint-staged：用于对 Git 暂存区中的文件执行代码检测。
+
+
+
+### eslint在react中的实践
+
+- ```javascript
+  npm install --save-dev eslint babel-eslint eslint-plugin-react eslint-config-alloy
+  ```
+
+- ```javascript
+  # eslint要忽略的文件
+  touch .eslintignore
+  
+  build/*.js
+  src/assets
+  public
+  dist
+  
+  ```
+
+- ```javascript
+  # eslint的规则
+  touch .eslintrc.js
+  
+  module.exports = {
+      extends: [
+          'alloy',
+          'alloy/react',
+      ],
+      env: {
+          // 你的环境变量（包含多个预定义的全局变量）
+          //
+          // browser: true,
+          // node: true,
+          // mocha: true,
+          // jest: true,
+          // jquery: true
+      },
+      globals: {
+          // 你的全局变量（设置为 false 表示它不允许被重新赋值）
+          //
+          // myGlobal: false
+      },
+      rules: {
+          // 自定义你的规则
+      }
+  };
+  ```
+
+  
+
+- 配置package.json 里面的执行脚本
+
+  ```javascript
+  # 检测 js 代码，然后通过 --fix 把 eslint 能解决的问题都在检测的时候解决掉，比如格式，比如变量合并。
+  
+  "scripts": {
+    "lint": "eslint --ext .js --fix"
+  }
+  ```
+
+
+
+### husky+lint-staged在react中的实践
+
+- ```javascript
+  npm i --save-dev lint-staged husky
+  ```
+
+  
+
+- 在package.json 里面配置 git 钩子
+
+  ```javascript
+  # 在 commit 之前进行检查，所以用到了 pre-commit 这个钩子
+  
+  # lint-staged 在 pre-commit 的时候执行，定义了对 git 暂存区中的文件执行的任务，我们这里只对 js 文件做 eslint 的格式化校验。
+  
+  {
+    "husky": {
+      "hooks": {
+        "pre-commit": "lint-staged"
+      }
+    },
+    "lint-staged": {
+      "src/**/*.{js,vue}": ["npm run lint", "git add"]
+    }
+  }
+  ```
+
+### 结合prettier使用
+
+- `eslint-config-alloy`从v3开始已经不包含样式相关的规则了， 所以我们不需要再引入`eslint-config-prettier`。只需要在vscode中安装prettier插件然后配置一份`.prettierrc.js`即可。
+
+  ```javascript
+  // .prettierrc.js
+  module.exports = {
+      // 一行最多 100 字符
+      printWidth: 100,
+      // 使用 4 个空格缩进
+      tabWidth: 4,
+      // 不使用缩进符，而使用空格
+      useTabs: false,
+      // 行尾需要有分号
+      semi: true,
+      // 使用单引号
+      singleQuote: true,
+      // 对象的 key 仅在必要时用引号
+      quoteProps: 'as-needed',
+      // jsx 不使用单引号，而使用双引号
+      jsxSingleQuote: false,
+      // 末尾不需要逗号
+      trailingComma: 'none',
+      // 大括号内的首尾需要空格
+      bracketSpacing: true,
+      // jsx 标签的反尖括号需要换行
+      jsxBracketSameLine: false,
+      // 箭头函数，只有一个参数的时候，也需要括号
+      arrowParens: 'always',
+      // 每个文件格式化的范围是文件的全部内容
+      rangeStart: 0,
+      rangeEnd: Infinity,
+      // 不需要写文件开头的 @prettier
+      requirePragma: false,
+      // 不需要自动在文件开头插入 @prettier
+      insertPragma: false,
+      // 使用默认的折行标准
+      proseWrap: 'preserve',
+      // 根据显示样式决定 html 要不要折行
+      htmlWhitespaceSensitivity: 'css',
+      // 换行符使用 lf
+      endOfLine: 'lf'
+  };
+  ```
+
+  
+
+
+
+ 
+
