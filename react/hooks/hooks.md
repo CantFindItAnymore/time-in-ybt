@@ -145,8 +145,7 @@ const MouseChange = () => {
   // 可以理解为这样一个生命周期：( 组件加载完成 || 组件更新完成 || 组件即将卸载 )时
 
   // 1. 产生某些副作用 ↓
-  useEffect(() => {
-    console.log('useEffect -- do something')
+  useEffect(() => {1
   })
 
   // 2. 消除某些副作用 ↓
